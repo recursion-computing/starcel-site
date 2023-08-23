@@ -175,7 +175,10 @@ background-attachment: fixed;
       easeFactor = 0.05;
       targetMousePosition = { ...prevPosition };
     }
-
+    
+    setTimeout(function() {
+      imageElement.src = "https://raw.githubusercontent.com/recursion-computing/starcel-site/main/StarcelLogo4.png?" + new Date().getTime();
+    }, 100);
   </script>
   <style>
     body {
