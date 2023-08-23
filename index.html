@@ -175,10 +175,11 @@ background-attachment: fixed;
       easeFactor = 0.05;
       targetMousePosition = { ...prevPosition };
     }
-    
+
+    //force image reload after .5s
     setTimeout(function() {
       imageElement.src = "https://raw.githubusercontent.com/recursion-computing/starcel-site/main/StarcelLogo4.png?" + new Date().getTime();
-    }, 100);
+    }, 500);
   </script>
   <style>
     body {
