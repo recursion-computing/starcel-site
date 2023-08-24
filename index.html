@@ -28,15 +28,31 @@ background-attachment: fixed;
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.155.0/three.min.js"></script>
   <script>
     //reload page once to fix image issues
-    window.onload = function() {
-        if(!window.location.hash) {
-            //window.location = window.location;
-            window.location.reload();
-        }
-    }
+    // window.onload = function() {
+    //     if(!window.location.hash) {
+    //         //window.location = window.location;
+    //         window.location.reload();
+    //     }
+    // }
+    
     //setTimeout(function() {
     //    imageElement.src = "https://raw.githubusercontent.com/recursion-computing/starcel-site/main/StarcelLogo4.png?" + new Date().getTime();
     //}, 500);
+
+    (function()
+    {
+      if( window.localStorage )
+      {
+        if( !localStorage.getItem('firstLoad') )
+        {
+          localStorage['firstLoad'] = true;
+          window.location.reload();
+        }  
+        else
+          localStorage.removeItem('firstLoad');
+      }
+    })();
+
     
     // variables
     const imageContainer = document.getElementById("imageContainer");
