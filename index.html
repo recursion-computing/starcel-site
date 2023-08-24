@@ -179,6 +179,7 @@ background-attachment: fixed;
     //force image reload after .5s
     setTimeout(function() {
       imageElement.src = "https://raw.githubusercontent.com/recursion-computing/starcel-site/main/StarcelLogo4.png?" + new Date().getTime();
+      window.location.reload();
     }, 500);
   </script>
   <style>
