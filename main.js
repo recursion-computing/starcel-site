@@ -56,7 +56,7 @@ var Star = function () {
     this.orbitX = w / 2;
     this.orbitY = h / 2;
     this.timePassed = random(0, maxStars);
-    this.speed = -1 * random(this.orbitRadius) / 1000000;
+    this.speed = -1 * random(this.orbitRadius) / 500000;
     this.alpha = random(2, 10) / 10;
 
     count++;
