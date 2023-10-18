@@ -17,217 +17,590 @@ background-attachment: fixed;
   <title>Starcel</title>
   <link rel="icon" href="favicon.ico" />
   <meta name="description" content="Unbounded Thinking">
-  <meta name="keywords" content="Starcel,Recursion,Corecursion,RecursionIs,CorecursionIs,Nick,Maleki,Science,Mathematics,Zero,Infinity,Unbounded,Spatial,Simulator,Infinitesimal,Programming,Software,Engineering,Mechanical,Electrical,Systems,Physics,QFT,Quantum,Mechanics,Consciousness,Dimension,Human,Artifical,Intelligence,Nodes,Evolution,Universe,Thought,Chemisty,Atoms">
+  <meta name="keywords"
+    content="Starcel,Recursion,Corecursion,RecursionIs,CorecursionIs,Nick,Maleki,Science,Mathematics,Zero,Infinity,Unbounded,Spatial,Simulator,Infinitesimal,Programming,Software,Engineering,Mechanical,Electrical,Systems,Physics,QFT,Quantum,Mechanics,Consciousness,Dimension,Human,Artifical,Intelligence,Nodes,Evolution,Universe,Thought,Chemisty,Atoms">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <meta property="og:title" content="Starcel" />
   <meta property="og:description" content="Unbounded Thinking" />
   <meta property="og:url" content="https://starcel.net" />
   <meta property="og:image" content="StarcelLogo.png" />
-  
+  <link href=' http://fonts.googleapis.com/css?family=Source+Code+Pro' rel='stylesheet' type='text/css' />
+  <link href="//fonts.googleapis.com/css?family=Nunito" rel='stylesheet' type='text/css' />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
-  <a href="https://github.com/recursion-computing/starcel">
-    <div id="imageContainer">
-      <img id="myImage" src="StarcelLogo4.png">
+  <!-- <a href="https://github.com/recursion-computing/starcel"> -->
+  <!-- <div id="imageContainer">
+      <img id="myImage" src="Starcel Logo Transparent2.png">
+    </div> -->
+  <div id="container">
+    <canvas id="canvas"></canvas>
+    <div id="overlay">
+      <form id="fs-frm" name="simple-contact-form" accept-charset="utf-8" action="https://formspree.io/f/xyyoqooz"
+        method="post">
+        <fieldset id="fs-frm-inputs">
+          <span id='close'
+            onclick='this.parentNode.parentNode.removeChild(this.parentNode); return false;'>x</span>&ensp;
+          Would you like to join our mailing list?&emsp;
+          <label for="full-name">Name</label>
+          <input type="text" name="name" id="full-name" placeholder="First and Last" required="">&emsp;
+          <label for="email-address">Email</label>
+          <input type="email" name="_replyto" id="email-address" placeholder="info@recursion.is" required="">&emsp;
+          <label for="message">Message</label>
+          <textarea rows="1" name="message" id="message" placeholder="optional"></textarea>
+          &emsp;
+          <input type="hidden" name="_subject" id="email-subject" value="Contact Form Submission">
+          <input type="submit" value="Submit">
+        </fieldset>
+      </form>
+      <div id="center2">
+        <a href="#download">
+        <div id="imageContainer">
+          <img id="myImage" src="Starcel Logo Transparent3.png"></img>
+        </div>
+      </a>
+      </div>
     </div>
-  </a>
+  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.155.0/three.min.js"></script>
-  <script>
-    //reload page once to fix image issues
-    // window.onload = function() {
-    //     if(!window.location.hash) {
-    //         //window.location = window.location;
-    //         window.location.reload();
-    //     }
-    // } https://raw.githubusercontent.com/recursion-computing/starcel-site/main/
-    
-    //setTimeout(function() {
-    //    imageElement.src = "https://raw.githubusercontent.com/recursion-computing/starcel-site/main/StarcelLogo4.png?" + new Date().getTime();
-    //}, 500);
+  <section id="demo">
+    <div class="container">
+      <h2 class="" style="padding:45px 30px 45px 30px;">A 3D Desktop Environment: Demo Video</h2>
+      <div id="center">
+        <iframe width="1600px" height="900px" style="display:inline-block;align-items: center;"
+          src="https://www.youtube.com/embed/pbcRpq36v4U?si=mZd63oFvik-_wWsL" title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <br>
+      <br>
+  </section>
+  </div>
+  </div>
 
-    // (function()
-    // {
-    //   if( window.localStorage )
-    //   {
-    //     if( !localStorage.getItem('firstLoad') )
-    //     {
-    //       localStorage['firstLoad'] = true;
-    //       window.location.reload();
-    //     }  
-    //     else
-    //       localStorage.removeItem('firstLoad');
-    //   }
-    // })();
+  <a href="#demo" class="goto-next scrolly">Next</a>
 
-    const image = document.getElementById("myImage");
-    image.onload = () => {
-      // variables
-      const imageContainer = document.getElementById("imageContainer");
-      const imageElement = document.getElementById("myImage");
-
-      let easeFactor = 0.01;
-      let scene, camera, renderer, planeMesh;
-      let mousePosition = { x: 0.5, y: 0.5 };
-      let targetMousePosition = { x: 0.5, y: 0.5 };
-      let mouseStopTimeout;
-      let aberrationIntensity = 0.0;
-      let lastPosition = { x: 0.5, y: 0.5 };
-      let prevPosition = { x: 0.5, y: 0.5 };
-
-      // shaders
-      const vertexShader = `
-      varying vec2 vUv;
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-  `;
-
-      const fragmentShader = `
-      varying vec2 vUv;
-      uniform sampler2D u_texture;    
-      uniform vec2 u_mouse;
-      uniform vec2 u_prevMouse;
-      uniform float u_aberrationIntensity;
-
-      void main() {
-          vec2 gridUV = floor(vUv * vec2(20.0, 20.0)) / vec2(20.0, 20.0);
-          vec2 centerOfPixel = gridUV + vec2(1.0/20.0, 1.0/20.0);
-          
-          vec2 mouseDirection = u_mouse - u_prevMouse;
-          
-          vec2 pixelToMouseDirection = centerOfPixel - u_mouse;
-          float pixelDistanceToMouse = length(pixelToMouseDirection);
-          float strength = smoothstep(0.3, 0.0, pixelDistanceToMouse);
+    <!-- Features -->
+    <section id="features">
+      <div class="container">
+        <div class="row">
+          <!-- Feature #1 -->
+          <section id="infocard">
+            <img src="pbr.gif" alt="" width="400px" />
+            <h2>Physically based rendering</h2>
+          </section>
   
-          vec2 uvOffset = strength * - mouseDirection * 0.2;
-          vec2 uv = vUv - uvOffset;
+          <!-- Feature #2 -->
+          <section id="infocard">
+            <img src="pyls.png" alt="" width="400px" />
+            <h2>Linux Commands in Python <br>in Windows in Starcel</h2>
+          </section>
+  
+          <!-- Feature #3 -->
+          <section id="infocard">
+            <img src="applications.png" alt="" width="400px"/>
+            <h2>3D Application Icons</h2>
+          </section>
+  
+          <!-- Feature #4 -->
+          <section id="infocard">
+            <img src="scale.gif" alt="" width="400px" />
+            <h2>Continuous Scaling</h2>
+          </section> 
+        </div>
+      </div>
+    </section>
 
-          vec4 colorR = texture2D(u_texture, uv + vec2(strength * u_aberrationIntensity * 0.01, 0.0));
-          vec4 colorG = texture2D(u_texture, uv);
-          vec4 colorB = texture2D(u_texture, uv - vec2(strength * u_aberrationIntensity * 0.01, 0.0));
+  <div class="wrapper">
+    <div class="cat_wrapper">
+      <div class="cat first_pose">
+        <div class="kitten">
+          <div class="cat_head">
+            <svg x="0px" y="0px" width="100%" height="100%" viewBox="0 0 76.4 61.2" style="fill:white">
+              <polygon class="eyes"
+                points="63.8,54.1 50.7,54.1 50.7,59.6 27.1,59.6 27.1,54.1 12.4,54.1 12.4,31.8 63.8,31.8 " />
+              <path d="M15.3,45.9h5.1V35.7h-5.1C15.3,35.7,15.3,45.9,15.3,45.9z M45.8,56.1V51H30.6v5.1H45.8z M61.1,35.7H56v10.2h5.1
+          V35.7z M10.2,61.2v-5.1H5.1V51H0V25.5h5.1V15.3h5.1V5.1h5.1V0h5.1v5.1h5.1v5.1h5.1v5.1c0,0,15.2,0,15.2,0v-5.1h5.1V5.1H56V0h5.1v5.1
+          h5.1v10.2h5.1v10.2h5.1l0,25.5h-5.1v5.1h-5.1v5.1H10.2z" />
+            </svg>
+          </div>
+          <div class="body">
+            <svg x="0px" y="0px" width="100%" height="100%" viewBox="0 0 91.7 40.8">
+              <path class="st0" d="M91.7,40.8H0V10.2h5.1V5.1h5.1V0h66.2v5.1h10.2v5.1h5.1L91.7,40.8z" />
+            </svg>
+            <div class="tail">
+              <svg x="0px" y="0px" width="100%" height="100%" viewBox="0 0 25.5 61.1">
+                <polygon class="st0" points="10.2,56 10.2,50.9 5.1,50.9 5.1,40.7 0,40.7 0,20.4 5.1,20.4 5.1,10.2 10.2,10.2 10.2,5.1 15.3,5.1 
+            15.3,0 25.5,0 25.5,10.2 20.4,10.2 20.4,15.3 15.3,15.3 15.3,20.4 10.2,20.4 10.2,40.7 15.3,40.7 15.3,45.8 20.4,45.8 20.4,50.9 
+            25.5,50.9 25.5,61.1 15.3,61.1 15.3,56 " />
+              </svg>
+            </div>
+          </div>
+          <div class="front_legs">
+            <div class="leg one">
+              <svg x="0px" y="0px" width="100%" height="100%" viewBox="0 0 14 30.5">
+                <polygon points="15.3,30.5 5.1,30.5 5.1,25.4 0,25.4 0,0 15.3,0 " />
+              </svg>
+            </div>
+            <div class="leg two">
+              <svg x="0px" y="0px" width="100%" height="100%" viewBox="0 0 14 30.5">
+                <polygon points="15.3,30.5 5.1,30.5 5.1,25.4 0,25.4 0,0 15.3,0 " />
+              </svg>
+            </div>
+          </div>
+          <div class="back_legs">
+            <div class="leg three">
+              <svg x="0px" y="0px" width="100%" height="100%" viewBox="0 0 14 30.5">
+                <polygon points="15.3,30.5 5.1,30.5 5.1,25.4 0,25.4 0,0 15.3,0 " />
+              </svg>
+            </div>
+            <div class="leg four">
+              <svg x="0px" y="0px" width="100%" height="100%" viewBox="0 0 14 30.5">
+                <polygon points="15.3,30.5 5.1,30.5 5.1,25.4 0,25.4 0,0 15.3,0 " />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Content -->
+  <section id="content">
+    <div class="container">
+      <section>
+        <h2>Commands and Features</h2>
+        <iframe width="1280px" height="720px" style="display:inline-block;align-items: center;"
+          src="https://www.youtube.com/embed/rJuRTZOE99g" title="YouTube video player" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+        <br>
+        <br>
+        <h2>Motivation, Technical Details, and Future Plans</h2>
 
-          gl_FragColor = vec4(colorR.r, colorG.g, colorB.b, 1.0);
+        <iframe width="1280px" height="720px" style="display:inline-block;align-items: center;"
+          src="https://www.youtube.com/embed/VYZHdEkLgC0" title="YouTube video player" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+
+      </section>
+
+      <!-- Box #1 -->
+      <section>
+
+        <h2>Where does the name "Starcel" come from?</h2>
+
+        <p>
+          - In software, the * character is used as a wildcard which could represent <i>literally</i> anything.
+          One of the goals of Starcel is to allow you to run <b>any</b> conceivable command and represent
+          <b>any</b> format of data.
+          <br>
+          - If you leave the axiomatically set area you will see your space and actions from a third person view—a
+          single star suspended in the void.
+          <br>
+          - Starcel runs inside the cells of a spreadsheet.
+          <br>
+          - "cel" relates to our acceleration algorithm.
+          <br>
+          - One of the algorithms we designed allows the spawning of basis within a spatial dimension. These basis
+          look like stars.
+          <br>
+          <img style="width:800px" src="DimSelectorOverride3.png">
+          <br>
+          - You, the user, are a Star! *
+        </p>
+        <br>
+        <br>
+        <h2>How many programming languages can be ran?</h2>
+        <p>
+          88. Are we in the future yet?<br>
+          matl, bash, befunge93, bqn, brachylog, brainfuck, cjam, clojure, cobol, coffeescript, cow, crystal, dart, dash, typescript, javascript, basic.net, fsharp.net, csharp.net, fsi, dragon, elixir, emacs, emojicode, erlang, file, forte, forth, freebasic, awk, c, c++, d, fortran, go, golfscript, groovy, haskell, husk, iverilog, japt, java, jelly, julia, kotlin, lisp, llvm_ir, lolcode, lua, csharp, basic, nasm, nasm64, nim, javascript, ocaml, octave, osabie, paradoc, pascal, perl, php, ponylang, prolog, pure, powershell, pyth, python2, python, racket, raku, retina, rockstar, rscript, ruby, rust, samarium, scala, smalltalk, sqlite3, swift, typescript, vlang, vyxal, yeethon, zig
+        </p>
+        <br>
+        <h2>Is the program stable?</h2>
+        <p>
+          No. Expect crashes, broken save files, object selection issues, and other bugs. 
+        </p>
+        <br>
+        <h2>How much is it?</h2>
+        <p>
+          For <i>you</i>, today? <b>Free.</b> This may be changed in the future
+        </p>
+        <br>
+        <h2>What operating Systems are supported?</h2>
+        <p>
+          Windows only🤡. Mac and Linux coming soon.
+        </p>
+        <br>
+        <h2>Is the source code available? </h2>
+        <p>
+          The C++ and blueprint code are not yet available; however, the entire Python source program is freely available.
+        </p>
+        <br>
+        <h2>Interested in Funny Paradoxes and Lambda Calculus? </h2>
+        <p>
+          Check this video out!<br>
+          <iframe width="270px" height="180px" style="display:inline-block;align-items: center;"
+          src="https://www.youtube.com/embed/hzg256Xc3lA" title="YouTube video player" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+        </p>
+        <br>
+        <h2>Want to help or support the project?</h2>
+        <p>
+          You can contact me by email, nick@recursion.is or on discord, @anick. <a style="text-decoration:none;"
+            href="https://paypal.me/RecursionIs">You can donate here.</a>
+        </p>
+    </div>
+
+    </div>
+    <section id="download">
+      <a href="https://github.com/recursion-computing/starcel" style="font-size:2em;text-decoration:none;"
+        download="">Download Windows x64
+        Portable</a>
+    </section>
+
+  </section>
+  <!-- Footer -->
+  <section>
+    <div class="footer">
+      <h2 class="">Quick Links</h2>
+      <a class="btn btn-link" href="https://notes.recursion.is"><img style="width:100px;"
+          src="Recursion Word Blue.png"></a>
+      <a class="btn btn-link" href="https://notes.recursion.is">About Us</a>
+      <a class="btn btn-link" href="mailto:contact@recursion.is">Contact Us</a>
+      <a class="btn btn-link" href="https://notes.recursion.is/#/page/privacy%20policy">Privacy Policy</a>
+      <a class="btn btn-link" href="mailto:help@recursion.is">Support</a>
+    </div>
+  </section>
+
+  <div class="copyright bar" style="background: #000000; color:white; font-size:.8em;font-weight:lighter">
+    &nbsp;© Copyright Recursion Computing LLC, 2023. All rights reserved. Designed by <a
+      style="color:white; text-decoration:none;" href="https://nickmaleki.com">Nick Maleki</a>
+  </div>
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.155.0/three.min.js"></script> -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@v0.157.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@v0.157.0/examples/jsm/"
       }
-  `;
-
-      function initializeScene(texture) {
-        //   scene creation
-        scene = new THREE.Scene();
-
-        // camera setup
-        camera = new THREE.PerspectiveCamera(
-          80,
-          imageElement.offsetWidth / imageElement.offsetHeight,
-          0.01,
-          10
-        );
-        camera.position.z = 1;
-
-        //   uniforms
-        let shaderUniforms = {
-          u_mouse: { type: "v2", value: new THREE.Vector2() },
-          u_prevMouse: { type: "v2", value: new THREE.Vector2() },
-          u_aberrationIntensity: { type: "f", value: 0.0 },
-          u_texture: { type: "t", value: texture }
-        };
-
-        //   creating a plane mesh with materials
-        planeMesh = new THREE.Mesh(
-          new THREE.PlaneGeometry(2, 2),
-          new THREE.ShaderMaterial({
-            uniforms: shaderUniforms,
-            vertexShader,
-            fragmentShader
-          })
-        );
-
-        //   add mesh to scene
-        scene.add(planeMesh);
-
-        //   render
-        renderer = new THREE.WebGLRenderer();
-        renderer.setSize(imageElement.offsetWidth, imageElement.offsetHeight);
-
-        //   create a canvas
-        imageContainer.appendChild(renderer.domElement);
-      }
-
-      // use the existing image from html in the canvas
-      initializeScene(new THREE.TextureLoader().load(imageElement.src));
-
-      animateScene();
-
-      function animateScene() {
-        requestAnimationFrame(animateScene);
-
-        mousePosition.x += (targetMousePosition.x - mousePosition.x) * easeFactor;
-        mousePosition.y += (targetMousePosition.y - mousePosition.y) * easeFactor;
-
-        planeMesh.material.uniforms.u_mouse.value.set(
-          mousePosition.x,
-          1.0 - mousePosition.y
-        );
-
-        planeMesh.material.uniforms.u_prevMouse.value.set(
-          prevPosition.x,
-          1.0 - prevPosition.y
-        );
-
-        aberrationIntensity = Math.max(0.0, aberrationIntensity - 0.05);
-
-        planeMesh.material.uniforms.u_aberrationIntensity.value = aberrationIntensity;
-
-        renderer.render(scene, camera);
-      }
-
-      // event listeners
-      imageContainer.addEventListener("mousemove", handleMouseMove);
-      imageContainer.addEventListener("mouseenter", handleMouseEnter);
-      imageContainer.addEventListener("mouseleave", handleMouseLeave);
-
-      function handleMouseMove(event) {
-        easeFactor = 0.02;
-        let rect = imageContainer.getBoundingClientRect();
-        prevPosition = { ...targetMousePosition };
-
-        targetMousePosition.x = (event.clientX - rect.left) / rect.width;
-        targetMousePosition.y = (event.clientY - rect.top) / rect.height;
-
-        aberrationIntensity = 1;
-      }
-
-      function handleMouseEnter(event) {
-        easeFactor = 0.02;
-        let rect = imageContainer.getBoundingClientRect();
-
-        mousePosition.x = targetMousePosition.x = (event.clientX - rect.left) / rect.width;
-        mousePosition.y = targetMousePosition.y = (event.clientY - rect.top) / rect.height;
-      }
-
-      function handleMouseLeave() {
-        easeFactor = 0.05;
-        targetMousePosition = { ...prevPosition };
-      }
-    };
-
+    }
   </script>
+  <script type="module" src="/main.js"></script>
+  <script>
+    //Catscript
+    function init() {
+      const catWrapper = document.querySelector('.cat_wrapper')
+      const wrapper = document.querySelector('.wrapper')
+      const cat = document.querySelector('.cat')
+      const head = document.querySelector('.cat_head')
+      const legs = document.querySelectorAll('.leg')
+      const pos = {
+        x: null,
+        y: null
+      }
+
+      const walk = () => {
+        cat.classList.remove('first_pose')
+        legs.forEach(leg => leg.classList.add('walk'))
+      }
+
+      const mousemargin = 5;
+
+      const handleMouseMotion = e => {
+        pos.x = e.clientX
+        pos.y = -e.clientY - 50
+        if (cat.classList.contains('face_right') && between(pos.x - 90, cat.offsetLeft - mousemargin, cat.offsetLeft + mousemargin) ||
+          cat.classList.contains('face_left') && between(pos.x + 10, cat.offsetLeft - mousemargin, cat.offsetLeft + mousemargin)) {
+        } else {
+          walk()
+        }
+
+      }
+
+      const handleTouchMotion = e => {
+        if (!e.targetTouches) return
+        pos.x = e.targetTouches[0].offsetX
+        pos.y = -e.targetTouches[0].offsetY - 50
+        if (cat.classList.contains('face_right') && between(pos.x - 90, cat.offsetLeft - mousemargin, cat.offsetLeft + mousemargin) ||
+          cat.classList.contains('face_left') && between(pos.x + 10, cat.offsetLeft - mousemargin, cat.offsetLeft + mousemargin)) {
+        } else {
+          walk()
+        }
+      }
+
+      const turnRight = () => {
+        cat.style.left = `${pos.x - 90}px`
+        cat.classList.remove('face_left')
+        cat.classList.add('face_right')
+      }
+
+      const turnLeft = () => {
+        cat.style.left = `${pos.x + 10}px`
+        cat.classList.remove('face_right')
+        cat.classList.add('face_left')
+      }
+
+      const decideTurnDirection = () => {
+        cat.getBoundingClientRect().x < pos.x ?
+          turnRight()
+          :
+          turnLeft()
+      }
+
+      const headMotion = () => {
+        pos.y > (wrapper.clientHeight - 100) ?
+          head.style.top = '-15px'
+          :
+          head.style.top = '-30px'
+      }
+
+      const jump = () => {
+        catWrapper.classList.remove('jump')
+        if (pos.y < (wrapper.clientHeight - 250)) { //opt not to -pos,y - 50
+          setTimeout(() => {
+            catWrapper.classList.add('jump')
+          }, 100)
+        }
+      }
+
+      function between(x, min, max) {
+        return x >= min && x <= max;
+      }
+
+      //pos.x - 90 === cat.offsetLeft
+      //pos.x + 10 === cat.offsetLeft
+      const decideStop = () => {
+        if (cat.classList.contains('face_right') && between(pos.x - 90, cat.offsetLeft - mousemargin, cat.offsetLeft + mousemargin) ||
+          cat.classList.contains('face_left') && between(pos.x + 10, cat.offsetLeft - mousemargin, cat.offsetLeft + mousemargin)) {
+          legs.forEach(leg => leg.classList.remove('walk'))
+        }
+      }
+
+      setInterval(() => {
+        if (!pos.x || !pos.y) return
+        decideTurnDirection()
+        headMotion()
+        decideStop()
+      }, 100)
+
+      setInterval(() => {
+        if (Math.random() < 0.25) {
+          catWrapper.classList.remove('jump')
+        }
+        if (!pos.x || !pos.y) return
+        if (Math.random() * 80 < 2) {
+          jump()
+        }
+      }, 1000) //50000
+
+      document.addEventListener('mousemove', handleMouseMotion)
+      document.addEventListener('mousemove', handleTouchMotion)
+
+      //https://github.com/christianp/creal.js
+      //const one_seventh = CReal.valueOf(7).inverse();
+      //console.log(one_seventh.toString(20));
+    }
+
+    window.addEventListener('DOMContentLoaded', init)
+  </script>
+
+
+  <!-- Website Elements Styling -->
   <style>
-    body {
+    #infocard {
+      padding:30px 30px 30px 30px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      align-items: stretch;
+      padding:45px 30px 45px 30px
+    }
+
+    p {
+      margin: 0 auto;
+    }
+
+    /* Features */
+    #features {
+      background: rgb(60, 60, 60);
+      border-bottom: solid 1px #272e31;
+      padding: 45px 0 45px 0;
+      text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.75);
+      color: #a0a8ab;
+    }
+
+    #features h2 {
+      font-size: 1.25em;
+      color: #fff;
+      margin: 0 0 0.25em 0;
+    }
+
+    #features a {
+      color: #e0e8eb;
+    }
+
+    #features strong {
+      color: #fff;
+    }
+
+    #center {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 1vh 1vw;
-      background-color: black;
+    }
+
+    /* Content */
+    #content {
+      background: #f7f7f7;
+      border-top: solid 1px #fff;
+      padding: 45px 0 45px 0;
+    }
+
+    #content section {
+      background: #fff;
+      padding: 40px 30px 45px 30px;
+      box-shadow: 2px 2px 2px 1px rgba(128, 128, 128, 0.1);
+      margin: 0 0 25px 0;
+    }
+
+    #content h2 {
+      font-size: 1.8em;
+      color: #373f42;
+      margin: 0 0 0.25em 0;
+    }
+
+    #content h3 {
+      color: #96a9b5;
+      font-size: 1.25em;
+    }
+
+    #content header {
+      margin: 0 0 2em 0;
+    }
+
+    #content .quote-list li {
+      border-bottom: solid 1px #e2e6e8;
+    }
+
+    #content .link-list li {
+      border-bottom: solid 1px #e2e6e8;
+    }
+
+    #content .check-list li {
+      border-bottom: solid 1px #e2e6e8;
+    }
+
+    /*** Footer ***/
+    h2 {
+      margin: 0 auto;
+      margin-bottom: 5px;
+    }
+
+    .footer {
+      display: inline-block;
+      padding: 40px 30px 45px;
+    }
+
+    .footer .btn.btn-link {
+      display: block;
+      margin-bottom: 5px;
+      padding: 0;
+      text-align: left;
+      color: var(--secondary);
+      font-weight: normal;
+      text-transform: capitalize;
+      transition: .3s;
+      text-decoration: none;
+    }
+
+    .footer .btn.btn-link::before {
+      position: relative;
+      content: "\f105";
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      margin-right: 10px;
+
+    }
+
+    .footer .btn.btn-link:hover {
+      color: var(--primary);
+      letter-spacing: 1px;
+      box-shadow: none;
+    }
+
+    a {
+      -moz-transition: border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+      -webkit-transition: border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+      -ms-transition: border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+      transition: border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    }
+
+    /* Goto Next */
+    .goto-next {
+      border: 0;
+      bottom: 0;
+      display: block;
+      height: 5em;
+      left: 50%;
+      margin: 0 0 0 -5em;
       overflow: hidden;
+      position: absolute;
+      text-indent: 10em;
+      white-space: nowrap;
+      width: 10em;
+      z-index: 10;
+      scale: .75;
+    }
+
+    .goto-next:before {
+      background-image: url("arrow.svg");
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      content: '';
+      display: block;
+      height: 1.5em;
+      left: 50%;
+      margin: -0.75em 0 0 -1em;
+      position: absolute;
+      top: 50%;
+      width: 2em;
+      z-index: 10;
+    }
+  </style>
+
+  <!-- Landing Page Styling -->
+  <style>
+    body {
+      /* text-align: center;
+      justify-content: center;
+      align-items: center; */
+      height: 100vh;
+      background-color: white;
+      /* overflow: hidden; */
+      margin: 0 auto;
+      font-family: source code pro;
+      font-weight: bold;
+      width: 100vw;
+      overflow-x: hidden;
     }
 
     canvas {
-      display: block;
+      position: absolute;
+      z-index: 1;
+      left: 0%;
+      top: 0%;
+      margin: 0 auto;
+      pointer-events: none;
     }
 
     #imageContainer {
@@ -245,12 +618,506 @@ background-attachment: fixed;
       filter: saturate(100%);
     }
 
+    #center2 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      scale: .2;
+    }
+
     #imageContainer>* {
       position: absolute;
       inset: 0;
       width: 100% !important;
       height: 100% !important;
       object-fit: cover;
+    }
+
+    #myImage {
+      scale: 0;
+    }
+
+    b {
+      font-weight: bolder;
+    }
+
+    #container {
+      position: relative;
+      margin: 0 auto;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      overflow-x: hidden;
+    }
+
+    #overlay {
+      left: 0%;
+      top: 0%;
+      position: absolute;
+      margin: 0 auto;
+      z-index: 2;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+  </style>
+
+  <!-- Email Input Styling -->
+  <style>
+    /* reset */
+    #fs-frm input,
+    #fs-frm select,
+    #fs-frm textarea,
+    #fs-frm fieldset,
+    #fs-frm optgroup,
+    #fs-frm label,
+    #fs-frm #card-element:disabled,
+    #close {
+      font-family: inherit;
+      font-size: 100%;
+      color: rgba(255, 255, 255, 0.7);
+      border: none;
+      border-radius: 0;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+
+    #close {
+      cursor: pointer;
+      -webkit-appearance: button;
+      -moz-appearance: button;
+      appearance: button;
+      padding: .1em;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+
+    #fs-frm,
+    #fs-frm-inputs {
+      width: 100%;
+      z-index: 5;
+      background-color: transparent;
+      /*(15, 15, 15);*/
+      display: inline-block;
+      animation: fadeIn ease 1s;
+    }
+
+    #fs-frm textarea {
+      margin-bottom: -.55rem;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    div.horizontalgap {
+      overflow: hidden;
+      height: 1px;
+      width: 0px;
+    }
+
+    #fs-frm label,
+    #fs-frm legend,
+    #fs-frm ::placeholder {
+      font-size: .825rem;
+    }
+
+    /* border, padding, margin, width */
+    #fs-frm input,
+    #fs-frm select,
+    #fs-frm textarea,
+    #fs-frm #card-element {
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background-color: transparent;
+    }
+
+    #fs-frm input:focus,
+    #fs-frm select:focus,
+    #fs-frm textarea:focus {
+      background-color: transparent;
+      outline-style: solid;
+      outline-width: thin;
+      outline-color: white;
+      outline-offset: -1px;
+    }
+
+    #fs-frm [type="button"],
+    #fs-frm [type="submit"],
+    #fs-frm [type="reset"],
+    #fs-frm [type="close"] {
+      cursor: pointer;
+      -webkit-appearance: button;
+      -moz-appearance: button;
+      appearance: button;
+    }
+
+    #fs-frm [type="button"]:focus,
+    #fs-frm [type="submit"]:focus,
+    #fs-frm [type="reset"]:focus,
+    #fs-frm [type="close"] {
+      outline: none;
+    }
+
+    #fs-frm [type="submit"],
+    #fs-frm [type="reset"],
+    #fs-frm [type="close"] {
+      margin-bottom: 0;
+    }
+
+    #fs-frm select {
+      text-transform: none;
+    }
+  </style>
+
+  <style>
+    /* CAT */
+    .wrapper {
+      /* position: absolute;
+        height: calc(0);
+        width: 100%;
+        top: 0; */
+      z-index: -20;
+      pointer-events: none;
+      transform: scaleY(-1) translate(0px, 73px);
+      /* flip upside down */
+    }
+
+    .ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 150px;
+      background-color: black;
+    }
+
+    /* .cat_wrapper, .cat_wrapper.jump{
+  transform:scale(50%); 
+} */
+
+    .kitten {
+      transform: scale(.5);
+      /* size:50%; */
+      /* height:50%; */
+    }
+
+    @media screen and (max-width: 600px) {
+      .mobile_spacer {
+        visibility: visible;
+        height: 10px;
+      }
+    }
+
+    .cat {
+      position: absolute;
+      bottom: 65px;
+      left: 100px;
+      height: 30px;
+      width: 60px;
+      transition: 1.5s;
+      transform-origin: center;
+      background-color: transparent;
+    }
+
+    /* body */
+    .body {
+      position: absolute;
+      height: 30px;
+      width: 60px;
+    }
+
+    .face_left .body {
+      animation: turn_body_left forwards 0.5s;
+    }
+
+    @keyframes turn_body_left {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(0.5, 1);
+      }
+    }
+
+    .face_right .body {
+      animation: turn_body_right forwards 0.5s;
+    }
+
+    @keyframes turn_body_right {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(0.5, 1);
+      }
+    }
+
+    /* head */
+    .cat_head {
+      position: absolute;
+      height: 40px;
+      width: 48px;
+      right: -10px;
+      top: -30px;
+      transition: 0.5s;
+      z-index: 50;
+    }
+
+    .first_pose .cat_head,
+    .face_left .cat_head {
+      right: 22px;
+    }
+
+    /* tail */
+    .tail {
+      position: absolute;
+      top: -25px;
+      height: 36px;
+      width: 15px;
+      animation: tail_motion forwards 2s;
+      transform-origin: bottom right;
+    }
+
+    @keyframes tail_motion {
+
+      0%,
+      100% {
+        left: -5px;
+        transform: rotate(0deg) scale(1);
+      }
+
+      50% {
+        left: -10px;
+        transform: rotate(-50deg) scale(-1, 1);
+      }
+    }
+
+    .first_pose .tail,
+    .face_left .tail {
+      left: 45px;
+      animation: tail_motion_alt forwards 2s;
+    }
+
+    @keyframes tail_motion_alt {
+
+      0%,
+      100% {
+        left: 45px;
+        transform: rotate(0deg) scale(1);
+      }
+
+      50% {
+        left: 40px;
+        transform: rotate(50deg) scale(-1, 1);
+      }
+    }
+
+    /* legs */
+    .leg {
+      position: absolute;
+      height: 20px;
+      width: 10px;
+      transform-origin: top center;
+    }
+
+    .front_legs,
+    .back_legs {
+      position: absolute;
+      height: 30px;
+      transition: 0.7s;
+    }
+
+    .front_legs {
+      width: 30px;
+      right: 0;
+    }
+
+    .back_legs {
+      width: 25px;
+      left: 0;
+    }
+
+    .face_left .leg svg {
+      transform: scale(-1, 1);
+    }
+
+    .face_right .front_legs {
+      right: 0;
+    }
+
+    .first_pose .front_legs,
+    .face_left .front_legs {
+      right: 30px;
+    }
+
+    .face_right .back_legs {
+      left: 0;
+    }
+
+    .first_pose .back_legs,
+    .face_left .back_legs {
+      left: 35px;
+    }
+
+    .one,
+    .three {
+      bottom: -15px;
+      right: 0;
+    }
+
+    .two,
+    .four {
+      bottom: -15px;
+      left: 0px;
+    }
+
+    .one.walk,
+    .three.walk {
+      animation: infinite 0.3s walk;
+    }
+
+    .two.walk,
+    .four.walk {
+      animation: infinite 0.3s walk_alt;
+    }
+
+    @keyframes walk {
+
+      0%,
+      100% {
+        transform: rotate(-10deg);
+      }
+
+      50% {
+        transform: rotate(10deg);
+      }
+    }
+
+    @keyframes walk_alt {
+
+      0%,
+      100% {
+        transform: rotate(10deg);
+      }
+
+      50% {
+        transform: rotate(-10deg);
+      }
+    }
+
+
+    /* jump */
+    .cat_wrapper {
+      position: absolute;
+      bottom: 0;
+    }
+
+    .cat_wrapper.jump .one {
+      animation: infinite 0.3s walk;
+    }
+
+    .cat_wrapper.jump .two {
+      animation: infinite 0.3s walk_alt;
+    }
+
+    .cat_wrapper.jump .three,
+    .cat_wrapper.jump .four {
+      animation: none;
+    }
+
+    .cat_wrapper.jump .cat.face_right .back_legs {
+      transform-origin: center;
+      transform: rotate(50deg);
+    }
+
+    .cat_wrapper.jump .cat.face_left .back_legs {
+      transform-origin: center;
+      transform: rotate(-50deg);
+    }
+
+    .cat_wrapper.jump .cat.face_right .front_legs {
+      transform-origin: center;
+      transform: rotate(-60deg);
+    }
+
+    .cat_wrapper.jump .cat.face_left .front_legs {
+      transform-origin: center;
+      transform: rotate(60deg);
+    }
+
+    .cat_wrapper.jump {
+      animation: jump forwards 1s;
+    }
+
+    @keyframes jump {
+
+      0%,
+      100% {
+        bottom: 0px;
+      }
+
+      50% {
+        bottom: 200px;
+      }
+    }
+
+    .jump .face_left {
+      animation: forwards 0.5s body_stand_left;
+      transform-origin: right bottom;
+    }
+
+    .jump .face_right {
+      animation: forwards 0.5s body_stand_right;
+      transform-origin: left bottom;
+    }
+
+    @keyframes body_stand_right {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(-45deg);
+      }
+    }
+
+    @keyframes body_stand_left {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(45deg);
+      }
+    }
+
+    svg {
+      height: 100%;
+      width: 100%;
+    }
+
+    polygon.eyes {
+      fill: #ecbba3;
+    }
+
+    /* controls cat color   */
+    polygon,
+    path {
+      /* fill:red; */
+      fill: rgb(245, 245, 245);
     }
   </style>
 </body>
